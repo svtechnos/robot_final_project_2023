@@ -22,12 +22,10 @@ public class Arm extends SubsystemBase {
 
   // Initaite the joystick here
   Joystick arm_joystick; // different joystick
-  PS4Controller examplePS4 = new PS4Controller(0); // 0 is the USB Port to be used as indicated on the Driver Station
-  XboxController exampleXbox = new XboxController(0); // 0 is the USB Port to be used as indicated on the Driver Station
   
   // limits 
   private double elbow_low=320; 
-  private double elbow_high=1600;
+  private double elbow_high=1800;
   private double shoulder_low=40; 
   private double shoulder_high=2000;
   private double claw_low=780; 
@@ -37,9 +35,9 @@ public class Arm extends SubsystemBase {
   private double ajoy_delta=0.25;
   private double ajoy_speed=5;
   private double claw_init=250; 
-  private double wrist_init=498; 
-  private double elbow_init=1600; 
-  private double shoulder_init=2000; 
+  private double wrist_init=560; 
+  private double elbow_init=1567; 
+  private double shoulder_init=1725; 
   private int preset_locktime_max=20;
 
   // initialization 
@@ -74,6 +72,7 @@ public class Arm extends SubsystemBase {
   private boolean ab9;
   private boolean ab10;
   private boolean ab11;
+  private boolean ab12;
   private boolean preset_triggerd;
   private long loop_n=0;
   private boolean lock_for_preset=false;
@@ -90,17 +89,15 @@ public class Arm extends SubsystemBase {
   private int waitcount=0;
   private double claw_a;
   private double claw_b;
-  private double[] armlens={0.8,0.66,0.533};
-  NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+  private double[] armlens={1,2,3,4};
+  private double[] armlens_r={0,1,2};
+  NetworkTable table = NetworkTableInstance.getDefault().getTable("Macro");
   NetworkTableEntry tv = table.getEntry("tv");
   NetworkTableEntry tx = table.getEntry("tx");
   NetworkTableEntry ty = table.getEntry("ty");
   NetworkTableEntry ta = table.getEntry("ta");
-  /*NetworkTableEntry FTape = table.pipeline(0);
-  NetworkTableEntry FTagR = table.pipeline(1);
-  NetworkTableEntry FtagB = table.pipeline(2);
-  table.getEntry("pipeline").setNumber(<pipeline_index>);
-  */
+  
+
 
   //servos
   PWM s0=new PWM(0);
@@ -109,14 +106,24 @@ public class Arm extends SubsystemBase {
   PWM s3=new PWM(3);
   // putting number in dashboard
   public void arm_pos(){
+  
     SmartDashboard.putNumber("DB/Slider 0", elbow_current);
     SmartDashboard.putNumber("DB/Slider 1", shoulder_current);
     SmartDashboard.putNumber("DB/Slider 2", wrist_current);
     SmartDashboard.putNumber("DB/Slider 3", claw_current);
   
+    armlens[0]=shoulder_current;
+    armlens[1]=elbow_current;
+    armlens[2]=wrist_current;
+    armlens[3]=claw_current;
+
+
+    SmartDashboard.putNumberArray("exmple", armlens);
+  //
+    SmartDashboard.getNumberArray("allrows", armlens_r);
+   // System.out.println(" s: " + armlens_r[1]);
   }
-  
-  // Initialize motors here
+
 
   public Arm(Joystick arm_joystick) {
     this.arm_joystick = arm_joystick;
@@ -151,9 +158,9 @@ public class Arm extends SubsystemBase {
 
       //System.out.println(" loop "+loop_n);}
 
-    //if (lock_for_preset) {
+    if (lock_for_preset) {
 
-        //System.out.println("plt "+preset_locktime);}
+      System.out.println("plt "+preset_locktime);}
 
     
     arm_pos();
@@ -194,85 +201,110 @@ public class Arm extends SubsystemBase {
 
 
    
-    /* 
-    if (ab3){
+    
+    if (ab3){ //pickup
+      preset_locktime_max=30;
       mode="hmode";
-      wrist_current=500;
-      elbow_current=557;
-      shoulder_current=38;
+      if (preset_locktime <5) {
 
-    }
-    if (ab4){
-      mode="vmode";
-      shoulder_current=479;
-
-    }
-    if (ab5){//restingv
-      mode="normal";
-        if (preset_locktime <1) {
-          elbow_current=320;
-        }
-        else {
-        shoulder_current=1700;
-        }
-        
-
-    }
-    if (ab6){//restingv
-      mode="vmode";
-        shoulder_current=1991;
-        }
-       
-        */
-    if (ab9){//restingv
-          mode="vmode";
-            shoulder_current=1991;
-            }
-  
-    if (ab1){
-      claw_current=1100;
-    }
-    else{claw_current=250;}
-
-    if (ab11){
-      // values: 300, 1469
-      if (wrist_current > 1700){
-        wrist_current = 500;
+      wrist_current=1607;
       }
       else{
-        wrist_current = 1800;
+      elbow_current=855;
+      shoulder_current=63;
+      }
+
+    }
+
+    if (ab5){//carry/rest
+      preset_locktime_max=30;
+      mode="normal";
+        if (preset_locktime <5) {
+          elbow_current=1908;
+        }
+        else {
+        shoulder_current=2000;
+        }
+      }
+
+    if (ab4){
+      mode="vmode";
+      shoulder_current=486;
+
+    }
+   
+
+  
+    if (ab6){//restingv
+      mode="vmode";
+        shoulder_current=1500;
+        }
+       
+        
+    if (ab9){//release1
+      preset_locktime_max=10;
+          mode="normal";
+            shoulder_current=1136;
+            elbow_current = 1042;
+            }
+    if (ab10){//release2
+          mode="normal";
+            shoulder_current=1136;
+            elbow_current = 1042;
+            }
+    if (ab12){//release2
+          mode="normal";
+            shoulder_current=983;
+            elbow_current = 1135;
+                }
+    if (ab1){
+      preset_locktime_max=10;
+      claw_current=1100;
+    }
+    else{claw_current=(ajz+1)*250+1;}
+
+    if (ab11){
+      preset_locktime_max=20;
+      // values: 300, 1469
+      if (wrist_current > 1500){
+        wrist_current = 375;
+      }
+      else{
+        wrist_current = 1617;
       }
     }
    
     //  else{mode="normal";}
 
     if (ab7){
+      preset_locktime_max=20;
       mode="hmode";
     }
     if (ab8){
+      preset_locktime_max=20;
       mode="vmode";
     }
     if (ab2){
+      preset_locktime_max=20;
       mode="normal";
     }
-     //System.out.println("ajh "+ ajh+" ajv"+ajv+"mode "+ mode);
+     //System.out.println("ajz "+ ajz+" ajt"+ajt+"ajf "+ ajf);
 if (mode=="hmode"){
-  elbow_current=shoulder_current*0.554+590;
+  elbow_current=shoulder_current*0.554+800;
 }
 if (mode=="vmode"){
   if (shoulder_current>1023){
     elbow_current=1600;
   }
   else {
-    elbow_current=shoulder_current*0.554+1035;
+    elbow_current=shoulder_current*0.554+1300;
   }
   
 }
 
 set_servos(claw_current,wrist_current,elbow_current,shoulder_current);
-System.out.println("Elbow: " + elbow_current);
-System.out.println("Shoulder: " + shoulder_current);
-System.out.println("moder: " + mode);
+System.out.println(" S: " + shoulder_current+" E: " + elbow_current+" W: " + wrist_current+" C: " + claw_current);
+
 
   
 }
@@ -287,9 +319,9 @@ System.out.println("moder: " + mode);
     ajy=arm_joystick.getY();
     ajz=arm_joystick.getRawAxis(3);
     ajt=arm_joystick.getRawAxis(2);
-    ajf=arm_joystick.getRawAxis(4);
-    ajh=arm_joystick.getRawAxis(5);
-    ajv=arm_joystick.getRawAxis(6);
+    //ajf=arm_joystick.getRawAxis(4);
+    //ajh=arm_joystick.getRawAxis(5);
+    //ajv=arm_joystick.getRawAxis(6);
     ab1=arm_joystick.getRawButton(1);
     ab2=arm_joystick.getRawButton(2);
     ab3=arm_joystick.getRawButton(3);
@@ -301,7 +333,8 @@ System.out.println("moder: " + mode);
     ab9=arm_joystick.getRawButton(9);
     ab10=arm_joystick.getRawButton(10);
     ab11=arm_joystick.getRawButton(11);
-    return ((ab1) || (ab2) || (ab3) || (ab4) ||(ab5)||(ab6)||(ab7)||(ab8)||(ab9)||(ab10)|| (ab11) ); }
+    ab12=arm_joystick.getRawButton(12);
+    return ((ab1) || (ab2) || (ab3) || (ab4) ||(ab5)||(ab6)||(ab7)||(ab8)||(ab9)||(ab10)|| (ab11)|| (ab12) ); }
     
   
   
@@ -322,5 +355,6 @@ System.out.println("moder: " + mode);
     servo_W(s2, elbow_set); //elbow joint 
     servo_W(s3, shoulder_set); //shoulder_init
   }
+
 
 }

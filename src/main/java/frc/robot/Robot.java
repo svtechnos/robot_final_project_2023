@@ -45,7 +45,9 @@ public class Robot extends TimedRobot {
   private double LRoll;
   private double cold;
   private double SYaw;
-  
+  public final int pipelineSwitchButton = 9;
+  public final int pipelineOne = 1;
+  NetworkTable table;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -61,6 +63,7 @@ public class Robot extends TimedRobot {
     drivetrain.resetDEncoders();
     CameraServer.startAutomaticCapture(0);
     CameraServer.startAutomaticCapture(1);
+    
     //cameraSelection=NetworkTableInstance.getDefault().getTable("").getEntry("CameraSelection");
 //CameraServer.startAutomaticCapture();
   }
@@ -77,7 +80,7 @@ public class Robot extends TimedRobot {
     drivetrain.gyroPutPitch();
     drivetrain.gyroPutRoll();
     drivetrain.gyroPutYaw();
-    NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+    table = NetworkTableInstance.getDefault().getTable("limelight");
     NetworkTableEntry tx = table.getEntry("tx"); // Horizontal Offset From Crosshair To Target (-27 degrees to 27 degrees)
     NetworkTableEntry ty = table.getEntry("ty"); // Vertical Offset From Crosshair To Target (-20.5 degrees to 20.5 degrees)
     //NetworkTableEntry tv = table.getEntry("tv"); // Whether the limelight has any valid targets (0 or 1)
@@ -127,6 +130,23 @@ public class Robot extends TimedRobot {
     double distanceFromLimelightToPegBaseInches = (Constants.heightTopInch - Constants.heightLimeInch)/Math.tan(angleToGoalRadians);
     return distanceFromLimelightToPegBaseInches;
   }
+
+  public void switchPipelines() {
+    // Check if the pipeline switch button is pressed
+    if (joystick.getRawButton(pipelineSwitchButton)) {
+      // Check which pipeline is currently active
+      int currentPipeline = (int) table.getEntry("pipeline").getDouble(0);
+
+      // Switch to the other pipeline
+      if (currentPipeline == pipelineOne) {
+        table.getEntry("pipeline").setDouble(1);
+        System.out.println("LIMELIGHT PIPELINE == 1");
+      } else {
+        table.getEntry("pipeline").setDouble(0);
+        System.out.println("LIMELIGHT PIPELINE == 0");
+      }
+    }
+   }
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {}

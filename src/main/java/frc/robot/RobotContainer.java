@@ -6,6 +6,7 @@ package frc.robot;
 
 import frc.robot.commands.Autos;
 import frc.robot.subsystems.Arm;
+//import frc.robot.subsystems.NeoArm;
 import frc.robot.subsystems.Drivetrain;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -23,7 +24,10 @@ public class RobotContainer {
   public final Joystick joystick = new Joystick(0);
   public final Joystick arm_joystick = new Joystick(1);
   public final Drivetrain drivetrain = new Drivetrain(joystick);
+  //Try new arm
   public final Arm arm = new Arm(arm_joystick);
+  //public final NeoArm arm = new NeoArm(arm_joystick);
+
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   //private final Joystick m_driverController =

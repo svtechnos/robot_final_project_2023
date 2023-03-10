@@ -40,13 +40,14 @@ public final class Constants {
   public static final double armdelta = 1;
   public static class ChargeStationConstants {
     //add these to the dashboard
-    public static final double gain = 0.025;
-    public static final double tgain = 0.007;
-    public static final double clip = 0.5;
-    public static final double start = 0.23;
-    public static final double climbDeg = 10;
-    public static final double angleClip = 5;
-    public static final double lrgain = 0.02;
+    //add back final after we finalize the coeffs
+    public static  double gain = 0.025;
+    public static  double tgain = 0.007;
+    public static  double clip = 0.5;
+    public static  double start = 0.23;
+    public static  double climbDeg = 10;
+    public static  double angleClip = 5;
+    public static  double lrgain = 0.02;
   }
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
